@@ -13,14 +13,14 @@ import com.swift.heartbeat.schedulers.JmsSenderScheduler;
 @RequestMapping("/api/v1")
 public class Controller {
 
-	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
 	@Autowired
 	private JmsSenderScheduler jmsSenderScheduler;
 
 	@GetMapping("/ondemand")
 	public void send() {
-		logger.info("On Demand service called");
+		LOGGER.info("On Demand service called");
 		jmsSenderScheduler.sendMessage();
 	}
 }

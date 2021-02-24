@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.swift.heartbeat.Constants.TableConstants;
+import com.swift.heartbeat.constants.TableConstants;
 
 @Entity
 @Table(name = TableConstants.TBL_SWIFT_HEART_BEAT)

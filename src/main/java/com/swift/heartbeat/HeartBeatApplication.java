@@ -1,23 +1,25 @@
 package com.swift.heartbeat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import com.swift.heartbeat.schedulers.JmsSenderScheduler;
 
 @SpringBootApplication
 @EnableScheduling
 public class HeartBeatApplication {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(HeartBeatApplication.class);
+
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(HeartBeatApplication.class, args);
-		// Get JMS template bean reference
-		JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
-
-		// Send a message
-		System.out.println("Sending a message.");
-		jmsTemplate.convertAndSend("http://localhost:8161/", "Test JMS message");
+		JmsSenderScheduler jmsSenderScheduler = context.getBean(JmsSenderScheduler.class);
+		LOGGER.info("Heart Beat Application startup...");
+		jmsSenderScheduler.sendMessage();
 	}
 
 }
