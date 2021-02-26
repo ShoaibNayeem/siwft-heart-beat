@@ -7,5 +7,7 @@ public class Constants {
 	public static final String ELAPSED_TIME = "elapsed_time";
 	public static final String START_TIME = "start_time";
 	public static final String END_TIME = "end_time";
+	public static final String NEW = "NEW";
+	public static final String COMPLETED = "COMPLETED";
 
 }

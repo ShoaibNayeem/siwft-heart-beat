@@ -23,4 +23,5 @@ public class Controller {
 		LOGGER.info("On Demand service called");
 		jmsSenderScheduler.sendMessage();
 	}
+
 }

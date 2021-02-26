@@ -4,11 +4,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +16,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.swift.heartbeat.constants.Constants;
-import com.swift.heartbeat.entities.ApplicationParametersEntity;
 import com.swift.heartbeat.entities.SwiftHeartBeatEntity;
-import com.swift.heartbeat.repositories.ApplicationParametersRepository;
 import com.swift.heartbeat.repositories.SwiftHeartBeatRepository;
+import com.swift.heartbeat.utils.SwiftHeartBeatUtils;
 
 @Component
 public class JmsSenderScheduler {
@@ -35,7 +32,7 @@ public class JmsSenderScheduler {
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
 	@Autowired
-	private ApplicationParametersRepository applicationParametersEntity;
+	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	Map<String, String> appParamsMap = new HashMap<>();
 
@@ -46,11 +43,13 @@ public class JmsSenderScheduler {
 			String uuid = generateUUID();
 			LOGGER.info("Sending message to queue");
 			String message = generateQueueMessage(uuid);
-			jmsTemplate.convertAndSend("http://localhost:8161/", message);
 			SwiftHeartBeatEntity swiftHeartBeatEntity = new SwiftHeartBeatEntity();
 			swiftHeartBeatEntity.setCorrelationId(uuid);
 			swiftHeartBeatEntity.setReqTimestamp(new Date());
+			swiftHeartBeatEntity.setAlarmActive(false);
+			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW);
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
+			jmsTemplate.convertAndSend("http://localhost:8161/", message);
 		} else {
 			LOGGER.info("Current time is not in between the specified time");
 		}
@@ -68,10 +67,7 @@ public class JmsSenderScheduler {
 	}
 
 	private boolean checkTime() {
-		List<ApplicationParametersEntity> applicationParametersEntities = applicationParametersEntity.findAll();
-		LOGGER.info("Number of records found --> " + applicationParametersEntities.size());
-		appParamsMap = applicationParametersEntities.stream()
-				.collect(Collectors.toMap(ApplicationParametersEntity::getKey, ApplicationParametersEntity::getValue));
+		appParamsMap = swiftHeartBeatUtils.getApplicationParameters();
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
 		LocalTime startTime = LocalTime.parse(appParamsMap.get(Constants.START_TIME));
 		LocalTime endTime = LocalTime.parse(appParamsMap.get(Constants.END_TIME));
@@ -82,9 +78,9 @@ public class JmsSenderScheduler {
 	private String generateQueueMessage(String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
-		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC)).append("0000000000").append("}");
-		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC)).append("N}");
-		msg.append("{4:20:SWIFTHEARTBEAT:12:123:77E:").append(uuid).append("-}");
+		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC)).append("0000000000").append("}\n");
+		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC)).append("N}\n");
+		msg.append("{4:20:SWIFTHEARTBEAT" + "\n" + ":12:123" + "\n" + ":77E:").append(uuid + "\n").append("-}");
 		LOGGER.info("Prepared message " + msg.toString());
 		return msg.toString();
 	}

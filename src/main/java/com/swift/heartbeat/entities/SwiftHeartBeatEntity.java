@@ -20,10 +20,10 @@ public class SwiftHeartBeatEntity {
 	private Date reqTimestamp;
 
 	@Column(name = TableConstants.COL_SWIFT_REP_TIME_STAMP)
-	private Date RepTimestamp;
+	private Date repTimestamp;
 
 	@Column(name = TableConstants.COL_SWIFT_ELAPSED_TIME)
-	private Date elapsedTime;
+	private Long elapsedTimeInMin;
 
 	@Column(name = TableConstants.COL_SWIFT_ALARM_ACTIVE)
 	private Boolean alarmActive;
@@ -48,19 +48,19 @@ public class SwiftHeartBeatEntity {
 	}
 
 	public Date getRepTimestamp() {
-		return RepTimestamp;
+		return repTimestamp;
 	}
 
 	public void setRepTimestamp(Date repTimestamp) {
-		RepTimestamp = repTimestamp;
+		this.repTimestamp = repTimestamp;
 	}
 
-	public Date getElapsedTime() {
-		return elapsedTime;
+	public Long getElapsedTimeInMin() {
+		return elapsedTimeInMin;
 	}
 
-	public void setElapsedTime(Date elapsedTime) {
-		this.elapsedTime = elapsedTime;
+	public void setElapsedTimeInMin(Long elapsedTimeInMin) {
+		this.elapsedTimeInMin = elapsedTimeInMin;
 	}
 
 	public Boolean getAlarmActive() {
