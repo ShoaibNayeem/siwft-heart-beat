@@ -1,5 +1,7 @@
 package com.swift.heartbeat.config;
 
+import java.util.concurrent.Executor;
+
 import javax.jms.ConnectionFactory;
 
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -11,6 +13,7 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableJms
@@ -30,6 +33,28 @@ public class JmsConfiguration {
 		converter.setTargetType(MessageType.TEXT);
 		converter.setTypeIdPropertyName("_type");
 		return converter;
+	}
+
+	@Bean("jmsSenderSchedulerJobPool")
+	public Executor jmsSenderSchedulerJobPool() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(1);
+		executor.setMaxPoolSize(1);
+		executor.setQueueCapacity(10);
+		executor.setThreadNamePrefix("jssjp-");
+		executor.initialize();
+		return executor;
+	}
+
+	@Bean("alarmistSchedulerJobPool")
+	public Executor alarmistSchedulerJobPool() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(1);
+		executor.setMaxPoolSize(1);
+		executor.setQueueCapacity(10);
+		executor.setThreadNamePrefix("asjp-");
+		executor.initialize();
+		return executor;
 	}
 
 }

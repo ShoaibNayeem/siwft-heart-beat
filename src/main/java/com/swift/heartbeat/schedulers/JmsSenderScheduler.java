@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,15 +35,16 @@ public class JmsSenderScheduler {
 	@Autowired
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
-	Map<String, String> appParamsMap = new HashMap<>();
-
+	@Async("jmsSenderSchedulerJobPool")
 	@Scheduled(cron = "0 */10 * * * 1-5")
 	public void sendMessage() {
-		if (checkTime()) {
+		Map<String, String> appParamsMap = new HashMap<>();
+		appParamsMap = swiftHeartBeatUtils.getApplicationParameters();
+		if (appParamsMap != null && !appParamsMap.isEmpty() && checkTime(appParamsMap)) {
 			LOGGER.info("Checking the current time is in between specified time");
 			String uuid = generateUUID();
 			LOGGER.info("Sending message to queue");
-			String message = generateQueueMessage(uuid);
+			String message = generateQueueMessage(appParamsMap, uuid);
 			SwiftHeartBeatEntity swiftHeartBeatEntity = new SwiftHeartBeatEntity();
 			swiftHeartBeatEntity.setCorrelationId(uuid);
 			swiftHeartBeatEntity.setReqTimestamp(new Date());
@@ -50,6 +52,7 @@ public class JmsSenderScheduler {
 			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW);
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
 			jmsTemplate.convertAndSend("http://localhost:8161/", message);
+			LOGGER.info("Message sent to queue");
 		} else {
 			LOGGER.info("Current time is not in between the specified time");
 		}
@@ -66,8 +69,7 @@ public class JmsSenderScheduler {
 		return uuid;
 	}
 
-	private boolean checkTime() {
-		appParamsMap = swiftHeartBeatUtils.getApplicationParameters();
+	private boolean checkTime(Map<String, String> appParamsMap) {
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
 		LocalTime startTime = LocalTime.parse(appParamsMap.get(Constants.START_TIME));
 		LocalTime endTime = LocalTime.parse(appParamsMap.get(Constants.END_TIME));
@@ -75,7 +77,7 @@ public class JmsSenderScheduler {
 		return (currentTime.isAfter(startTime) && currentTime.isBefore(endTime));
 	}
 
-	private String generateQueueMessage(String uuid) {
+	private String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
 		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC)).append("0000000000").append("}\n");
