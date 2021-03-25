@@ -20,7 +20,7 @@ public class JmsReceiver {
 	@Autowired
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
-	@JmsListener(destination = "http://localhost:8161/")
+	@JmsListener(destination = "http://localhost:8161/queue")
 	public void receiveMessage(String message) {
 		LOGGER.info("Recieved message from the queue " + message);
 		String correlationId = getCorrelationIdFromMessage(message);

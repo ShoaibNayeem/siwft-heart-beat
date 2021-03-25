@@ -37,9 +37,9 @@ public class JmsSenderScheduler {
 
 	@Async("jmsSenderSchedulerJobPool")
 	@Scheduled(cron = "0 */10 * * * 1-5")
-	public void sendMessage() {
+	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getApplicationParameters();
+		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
 		if (appParamsMap != null && !appParamsMap.isEmpty() && checkTime(appParamsMap)) {
 			LOGGER.info("Checking the current time is in between specified time");
 			String uuid = generateUUID();
@@ -49,9 +49,9 @@ public class JmsSenderScheduler {
 			swiftHeartBeatEntity.setCorrelationId(uuid);
 			swiftHeartBeatEntity.setReqTimestamp(new Date());
 			swiftHeartBeatEntity.setAlarmActive(false);
-			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW);
+			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
-			jmsTemplate.convertAndSend("http://localhost:8161/", message);
+			jmsTemplate.convertAndSend("http://localhost:8161/queue", message);
 			LOGGER.info("Message sent to queue");
 		} else {
 			LOGGER.info("Current time is not in between the specified time");
@@ -71,8 +71,8 @@ public class JmsSenderScheduler {
 
 	private boolean checkTime(Map<String, String> appParamsMap) {
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-		LocalTime startTime = LocalTime.parse(appParamsMap.get(Constants.START_TIME));
-		LocalTime endTime = LocalTime.parse(appParamsMap.get(Constants.END_TIME));
+		LocalTime startTime = LocalTime.parse(appParamsMap.get(Constants.START_TIME.getValue()));
+		LocalTime endTime = LocalTime.parse(appParamsMap.get(Constants.END_TIME.getValue()));
 		LocalTime currentTime = LocalTime.parse(formatter.format(new Date().getTime()));
 		return (currentTime.isAfter(startTime) && currentTime.isBefore(endTime));
 	}
@@ -80,8 +80,8 @@ public class JmsSenderScheduler {
 	private String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
-		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC)).append("0000000000").append("}\n");
-		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC)).append("N}\n");
+		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000").append("}\n");
+		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}\n");
 		msg.append("{4:20:SWIFTHEARTBEAT" + "\n" + ":12:123" + "\n" + ":77E:").append(uuid + "\n").append("-}");
 		LOGGER.info("Prepared message " + msg.toString());
 		return msg.toString();

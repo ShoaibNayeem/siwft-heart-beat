@@ -22,11 +22,11 @@ public class EmailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
 
-	public String sendEmail(Session session, Map<String, String> appParamsMap, String subject, String body) {
+	public String sendEmail(Session session, Map<String, String> appParamsMap) {
 		try {
-			LOGGER.info("Sending email to " + appParamsMap.get(Constants.RECIPIENT));
+			LOGGER.info("Sending email to " + appParamsMap.get(Constants.RECIPIENT.getValue()));
 			MimeMessage msg = new MimeMessage(session);
-			msg = prepareMessage(msg, appParamsMap, subject, body);
+			msg = prepareEmailContent(msg, appParamsMap);
 //			Transport transport = session.getTransport("smtp");
 //			transport.connect();
 			Transport.send(msg);
@@ -34,21 +34,21 @@ public class EmailService {
 		} catch (Exception e) {
 			LOGGER.error("Error occured while sending email " + e.getMessage());
 		}
-		return Constants.SUCCESS;
+		return Constants.SUCCESS.getValue();
 	}
 
-	private MimeMessage prepareMessage(MimeMessage msg, Map<String, String> appParamsMap, String subject, String body)
+	private MimeMessage prepareEmailContent(MimeMessage msg, Map<String, String> appParamsMap)
 			throws MessagingException, UnsupportedEncodingException {
 		msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
 		msg.addHeader("format", "flowed");
 		msg.addHeader("Content-Transfer-Encoding", "8bit");
-		msg.setFrom(new InternetAddress(appParamsMap.get(Constants.SMTP_SENDER), "Swift Team"));
-		msg.setReplyTo(InternetAddress.parse(appParamsMap.get(Constants.SMTP_SENDER), false));
-		msg.setSubject(subject, "UTF-8");
-		msg.setText(body, "UTF-8");
+		msg.setFrom(new InternetAddress(appParamsMap.get(Constants.SMTP_SENDER.getValue()), "Swift Team"));
+		msg.setReplyTo(InternetAddress.parse(appParamsMap.get(Constants.SMTP_SENDER.getValue()), false));
+		msg.setSubject(appParamsMap.get(Constants.EMAIL_SUBJECT.getValue()), "UTF-8");
+		msg.setText(appParamsMap.get(Constants.EMAIL_BODY.getValue()), "UTF-8");
 		msg.setSentDate(new Date());
 		msg.setRecipients(Message.RecipientType.TO,
-				InternetAddress.parse(appParamsMap.get(Constants.RECIPIENT), false));
+				InternetAddress.parse(appParamsMap.get(Constants.RECIPIENT.getValue()), false));
 		return msg;
 	}
 

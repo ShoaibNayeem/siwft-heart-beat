@@ -11,4 +11,6 @@ INSERT INTO tb_application_parameters(id,key,value) VALUES(9,'SMTP_STARTTLS_ENAB
 INSERT INTO tb_application_parameters(id,key,value) VALUES(10,'SMTP_SENDER', 'xyzsender@gmail.com');
 INSERT INTO tb_application_parameters(id,key,value) VALUES(11,'SMTP_SENDER_PASSWORD', 'password');
 INSERT INTO tb_application_parameters(id,key,value) VALUES(12,'RECIPIENT', 'recepient@gmail.com');
-	
+INSERT INTO tb_application_parameters(id,key,value) VALUES(13,'EMAIL_SUBJECT', 'Swift Heart-Beat Check');
+INSERT INTO tb_application_parameters(id,key,value) VALUES(14,'EMAIL_BODY', 'Hi,' || CHAR(10) || CHAR(10) || 'Received request to check swift heart-beat.' || CHAR(10) || CHAR(10) || 'Thanks & Regards,' || CHAR(10) || 'Team');
+INSERT INTO tb_application_parameters(id,key,value) VALUES(15,'HOUSEKEEPING_TERM', '0');

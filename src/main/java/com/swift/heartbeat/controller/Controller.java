@@ -39,28 +39,27 @@ public class Controller {
 	@GetMapping("/ondemand")
 	public ResponseEntity<String> onDemand() {
 		LOGGER.info("On Demand service called");
-		String status = Constants.FAILURE;
+		String status = Constants.FAILURE.getValue();
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getApplicationParameters();
+		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
 		if (appParamsMap != null && !appParamsMap.isEmpty()) {
 			Session session = getSessionInstance(appParamsMap);
-			status = emailService.sendEmail(session, appParamsMap, "Swift Heart-Beat Check",
-					"Hi,\n\nReceived request to check swift heart-beat.\n\nThanks & Regards,\nTeam");
-			jmsSenderScheduler.sendMessage();
+			status = emailService.sendEmail(session, appParamsMap);
+			jmsSenderScheduler.sendMessageToQueue();
 		}
 		return ResponseEntity.ok().body(status);
 	}
 
 	private Session getSessionInstance(Map<String, String> appParamsMap) {
 		Properties props = System.getProperties();
-		props.put("mail.smtp.host", appParamsMap.get(Constants.SMTP_HOST));
-		props.put("mail.smtp.port", appParamsMap.get(Constants.SMTP_PORT));
-		props.put("mail.smtp.auth", appParamsMap.get(Constants.SMTP_AUTH));
-		props.put("mail.smtp.starttls.enable", appParamsMap.get(Constants.SMTP_STARTTLS_ENABLE));
+		props.put("mail.smtp.host", appParamsMap.get(Constants.SMTP_HOST.getValue()));
+		props.put("mail.smtp.port", appParamsMap.get(Constants.SMTP_PORT.getValue()));
+		props.put("mail.smtp.auth", appParamsMap.get(Constants.SMTP_AUTH.getValue()));
+		props.put("mail.smtp.starttls.enable", appParamsMap.get(Constants.SMTP_STARTTLS_ENABLE.getValue()));
 		Authenticator auth = new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(appParamsMap.get(Constants.SMTP_SENDER),
-						appParamsMap.get(Constants.SMTP_SENDER_PASSWORD));
+				return new PasswordAuthentication(appParamsMap.get(Constants.SMTP_SENDER.getValue()),
+						appParamsMap.get(Constants.SMTP_SENDER_PASSWORD.getValue()));
 			}
 		};
 		return Session.getDefaultInstance(props, auth);

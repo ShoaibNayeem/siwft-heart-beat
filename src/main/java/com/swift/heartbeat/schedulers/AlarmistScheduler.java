@@ -30,18 +30,18 @@ public class AlarmistScheduler {
 	public void alarmistCheck() {
 		LOGGER.info("Alarmist scheduler called");
 		List<SwiftHeartBeatEntity> swiftHeartBeatEntities = swiftHeartBeatRepository
-				.findAllByAlarmistCheck(Constants.NEW);
+				.findAllByAlarmistCheck(Constants.NEW.getValue());
 		LOGGER.info("Number of records with NEW alarmist check " + swiftHeartBeatEntities.size());
 		if (swiftHeartBeatEntities != null && !swiftHeartBeatEntities.isEmpty()) {
 			for (SwiftHeartBeatEntity swiftHeartBeatEntity : swiftHeartBeatEntities) {
 				long elapsedTime = findDifferenceInTime(swiftHeartBeatEntity);
 				swiftHeartBeatEntity.setElapsedTimeInMin(elapsedTime);
 				if (elapsedTime >= Integer
-						.parseInt(swiftHeartBeatUtils.getApplicationParameters().get(Constants.ELAPSED_TIME))) {
+						.parseInt(swiftHeartBeatUtils.getAppParamsMap().get(Constants.ELAPSED_TIME.getValue()))) {
 					LOGGER.info("Elapsed time is above the limit " + elapsedTime);
 					swiftHeartBeatEntity.setAlarmActive(true);
 				}
-				swiftHeartBeatEntity.setAlarmistCheck(Constants.COMPLETED);
+				swiftHeartBeatEntity.setAlarmistCheck(Constants.COMPLETED.getValue());
 				swiftHeartBeatRepository.save(swiftHeartBeatEntity);
 			}
 		}

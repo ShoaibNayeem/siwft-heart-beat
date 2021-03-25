@@ -38,8 +38,8 @@ public class JmsConfiguration {
 	@Bean("jmsSenderSchedulerJobPool")
 	public Executor jmsSenderSchedulerJobPool() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(1);
-		executor.setMaxPoolSize(1);
+		executor.setCorePoolSize(2);
+		executor.setMaxPoolSize(3);
 		executor.setQueueCapacity(10);
 		executor.setThreadNamePrefix("jssjp-");
 		executor.initialize();
@@ -49,10 +49,21 @@ public class JmsConfiguration {
 	@Bean("alarmistSchedulerJobPool")
 	public Executor alarmistSchedulerJobPool() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(1);
-		executor.setMaxPoolSize(1);
+		executor.setCorePoolSize(2);
+		executor.setMaxPoolSize(3);
 		executor.setQueueCapacity(10);
 		executor.setThreadNamePrefix("asjp-");
+		executor.initialize();
+		return executor;
+	}
+
+	@Bean("houseKeepingSchedulerJobPool")
+	public Executor houseKeepingSchedulerJobPool() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(2);
+		executor.setMaxPoolSize(3);
+		executor.setQueueCapacity(10);
+		executor.setThreadNamePrefix("hksjp-");
 		executor.initialize();
 		return executor;
 	}

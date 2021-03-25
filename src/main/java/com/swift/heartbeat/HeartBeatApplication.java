@@ -2,6 +2,7 @@ package com.swift.heartbeat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -17,11 +18,23 @@ public class HeartBeatApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HeartBeatApplication.class);
 
+	private static ConfigurableApplicationContext context;
+
 	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(HeartBeatApplication.class, args);
+		context = SpringApplication.run(HeartBeatApplication.class, args);
 		JmsSenderScheduler jmsSenderScheduler = context.getBean(JmsSenderScheduler.class);
 		LOGGER.info("Heart Beat Application startup...");
-		jmsSenderScheduler.sendMessage();
+		jmsSenderScheduler.sendMessageToQueue();
 	}
 
+	public static void restart() {
+		LOGGER.info("Restarting the application...");
+		ApplicationArguments applicationArguments = context.getBean(ApplicationArguments.class);
+		Thread thread = new Thread(() -> {
+			context.close();
+			context = SpringApplication.run(HeartBeatApplication.class, applicationArguments.getSourceArgs());
+		});
+		thread.setDaemon(false);
+		thread.start();
+	}
 }
