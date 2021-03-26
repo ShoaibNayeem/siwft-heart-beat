@@ -1,6 +1,7 @@
 package com.swift.heartbeat.schedulers;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class JmsSenderScheduler {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@Async("jmsSenderSchedulerJobPool")
-	@Scheduled(cron = "0 */10 * * * 1-5")
+	@Scheduled(cron = "0 */10 * * * *")
 	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
 		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
@@ -70,11 +71,77 @@ public class JmsSenderScheduler {
 	}
 
 	private boolean checkTime(Map<String, String> appParamsMap) {
+		String currentDay = checkCurrentDay();
+		LocalTime startTime = null;
+		LocalTime endTime = null;
+		switch (currentDay) {
+			 case "MONDAY":
+				 if (!appParamsMap.get(Constants.MON_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.MON_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.MON_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "TUESDAY":
+				 if (!appParamsMap.get(Constants.TUES_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.TUES_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.TUES_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "WEDNESDAY":
+				 if (!appParamsMap.get(Constants.WED_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.WED_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.WED_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "THURSDAY":
+				 if (!appParamsMap.get(Constants.THUR_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.THUR_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.THUR_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "FRIDAY":
+				 if (!appParamsMap.get(Constants.FRI_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.FRI_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.FRI_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "SATURDAY":
+				 if (!appParamsMap.get(Constants.SAT_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.SAT_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.SAT_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 case "SUNDAY":
+				 if (!appParamsMap.get(Constants.SUN_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
+					 startTime = LocalTime.parse(appParamsMap.get(Constants.SUN_START_TIME.getValue()));
+					 endTime = LocalTime.parse(appParamsMap.get(Constants.SUN_END_TIME.getValue()));
+				 } else {
+					 return false;
+				 }
+				 break;
+			 default:
+				 LOGGER.error("NOT KNOWN");
+		}
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-		LocalTime startTime = LocalTime.parse(appParamsMap.get(Constants.START_TIME.getValue()));
-		LocalTime endTime = LocalTime.parse(appParamsMap.get(Constants.END_TIME.getValue()));
 		LocalTime currentTime = LocalTime.parse(formatter.format(new Date().getTime()));
 		return (currentTime.isAfter(startTime) && currentTime.isBefore(endTime));
+	}
+
+	private String checkCurrentDay() {
+		LocalDate date = LocalDate.now();
+		return date.getDayOfWeek().toString();
 	}
 
 	private String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
