@@ -1,3 +1,26 @@
+CREATE TABLE IF NOT EXISTS tb_application_parameters (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `key` VARCHAR(255) NOT NULL,
+  `value` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+  CREATE TABLE IF NOT EXISTS tb_swift_heart_beat (
+  `correlation_id` VARCHAR(255) NOT NULL,
+  `req_time_stamp` DATETIME NULL,
+  `rep_time_stamp` DATETIME NULL,
+  `elapsed_time_in_min` INT NULL,
+  `alarm_active` BOOLEAN NULL,
+  `alarmsit_check` VARCHAR(45) NULL,
+  PRIMARY KEY (`correlation_id`));
+  
+CREATE TABLE shedlock (
+  name VARCHAR(64),
+  lock_until TIMESTAMP(3) NULL,
+  locked_at TIMESTAMP(3) NULL,
+  locked_by VARCHAR(255),
+  PRIMARY KEY (name)
+);
+
 INSERT INTO tb_application_parameters(id,key,value) VALUES(1,'SENDER_BIC', 'SENDER_BIC');
 INSERT INTO tb_application_parameters(id,key,value) VALUES(2,'RECEIVER_BIC', 'RECEIVER_BIC');
 INSERT INTO tb_application_parameters(id,key,value) VALUES(3,'ELAPSED_TIME', '8');

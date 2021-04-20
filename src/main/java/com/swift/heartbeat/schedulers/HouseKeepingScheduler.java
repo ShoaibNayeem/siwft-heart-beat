@@ -22,8 +22,8 @@ public class HouseKeepingScheduler {
 	@Autowired
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
-	@Async("houseKeepingSchedulerJobPool")
-	@Scheduled(cron = "0 */10 * * * 1-5")
+//	@Async("houseKeepingSchedulerJobPool")
+//	@Scheduled(cron = "0 */10 * * * 1-5")
 	public void houseKeeping() {
 		Map<String, String> appParamsMap = new HashMap<>();
 		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();

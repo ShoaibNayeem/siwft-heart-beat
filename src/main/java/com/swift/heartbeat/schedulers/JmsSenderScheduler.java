@@ -22,6 +22,8 @@ import com.swift.heartbeat.entities.SwiftHeartBeatEntity;
 import com.swift.heartbeat.repositories.SwiftHeartBeatRepository;
 import com.swift.heartbeat.utils.SwiftHeartBeatUtils;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 @Component
 public class JmsSenderScheduler {
 
@@ -38,6 +40,7 @@ public class JmsSenderScheduler {
 
 	@Async("jmsSenderSchedulerJobPool")
 	@Scheduled(cron = "0 */10 * * * *")
+	@SchedulerLock(name = "JmsSenderScheduler_sendMessageToQueue", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
 		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
@@ -75,64 +78,71 @@ public class JmsSenderScheduler {
 		LocalTime startTime = null;
 		LocalTime endTime = null;
 		switch (currentDay) {
-			 case "MONDAY":
-				 if (!appParamsMap.get(Constants.MON_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.MON_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.MON_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "TUESDAY":
-				 if (!appParamsMap.get(Constants.TUES_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.TUES_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.TUES_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "WEDNESDAY":
-				 if (!appParamsMap.get(Constants.WED_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.WED_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.WED_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "THURSDAY":
-				 if (!appParamsMap.get(Constants.THUR_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.THUR_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.THUR_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "FRIDAY":
-				 if (!appParamsMap.get(Constants.FRI_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.FRI_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.FRI_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "SATURDAY":
-				 if (!appParamsMap.get(Constants.SAT_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.SAT_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.SAT_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 case "SUNDAY":
-				 if (!appParamsMap.get(Constants.SUN_START_TIME.getValue()).toUpperCase().equals(Constants.NO_RUN.getValue())) {
-					 startTime = LocalTime.parse(appParamsMap.get(Constants.SUN_START_TIME.getValue()));
-					 endTime = LocalTime.parse(appParamsMap.get(Constants.SUN_END_TIME.getValue()));
-				 } else {
-					 return false;
-				 }
-				 break;
-			 default:
-				 LOGGER.error("NOT KNOWN");
+		case "MONDAY":
+			if (!appParamsMap.get(Constants.MON_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.MON_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.MON_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "TUESDAY":
+			if (!appParamsMap.get(Constants.TUES_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.TUES_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.TUES_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "WEDNESDAY":
+			if (!appParamsMap.get(Constants.WED_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.WED_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.WED_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "THURSDAY":
+			if (!appParamsMap.get(Constants.THUR_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.THUR_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.THUR_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "FRIDAY":
+			if (!appParamsMap.get(Constants.FRI_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.FRI_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.FRI_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "SATURDAY":
+			if (!appParamsMap.get(Constants.SAT_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SAT_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SAT_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		case "SUNDAY":
+			if (!appParamsMap.get(Constants.SUN_START_TIME.getValue()).toUpperCase()
+					.equals(Constants.NO_RUN.getValue())) {
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SUN_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SUN_END_TIME.getValue()));
+			} else {
+				return false;
+			}
+			break;
+		default:
+			LOGGER.error("NOT KNOWN");
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
 		LocalTime currentTime = LocalTime.parse(formatter.format(new Date().getTime()));

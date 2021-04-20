@@ -33,6 +33,7 @@ public class EmailService {
 			LOGGER.info("Email sent successfully");
 		} catch (Exception e) {
 			LOGGER.error("Error occured while sending email " + e.getMessage());
+			return Constants.FAILURE.getValue();
 		}
 		return Constants.SUCCESS.getValue();
 	}

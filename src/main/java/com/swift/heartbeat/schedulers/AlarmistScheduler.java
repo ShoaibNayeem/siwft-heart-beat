@@ -14,6 +14,8 @@ import com.swift.heartbeat.entities.SwiftHeartBeatEntity;
 import com.swift.heartbeat.repositories.SwiftHeartBeatRepository;
 import com.swift.heartbeat.utils.SwiftHeartBeatUtils;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 @Component
 public class AlarmistScheduler {
 
@@ -27,6 +29,7 @@ public class AlarmistScheduler {
 
 	@Async("alarmistSchedulerJobPool")
 	@Scheduled(cron = "0 */10 * * * 1-5")
+	@SchedulerLock(name = "AlarmistScheduler_alarmistCheck", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void alarmistCheck() {
 		LOGGER.info("Alarmist scheduler called");
 		List<SwiftHeartBeatEntity> swiftHeartBeatEntities = swiftHeartBeatRepository

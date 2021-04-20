@@ -21,6 +21,8 @@ import com.swift.heartbeat.schedulers.JmsSenderScheduler;
 import com.swift.heartbeat.services.EmailService;
 import com.swift.heartbeat.utils.SwiftHeartBeatUtils;
 
+import io.swagger.annotations.ApiResponse;
+
 @RestController
 @RequestMapping("/api/v1")
 public class Controller {
@@ -37,6 +39,7 @@ public class Controller {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@GetMapping("/ondemand")
+	@ApiResponse(code = 200, message = "Status of Email delivery and sending message to queue")
 	public ResponseEntity<String> onDemand() {
 		LOGGER.info("On Demand service called");
 		String status = Constants.FAILURE.getValue();
@@ -45,7 +48,8 @@ public class Controller {
 		if (appParamsMap != null && !appParamsMap.isEmpty()) {
 			Session session = getSessionInstance(appParamsMap);
 			status = emailService.sendEmail(session, appParamsMap);
-			jmsSenderScheduler.sendMessageToQueue();
+			if (status.equals(Constants.SUCCESS.getValue()))
+				jmsSenderScheduler.sendMessageToQueue();
 		}
 		return ResponseEntity.ok().body(status);
 	}

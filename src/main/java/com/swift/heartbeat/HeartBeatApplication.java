@@ -11,9 +11,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.swift.heartbeat.schedulers.JmsSenderScheduler;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class HeartBeatApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HeartBeatApplication.class);

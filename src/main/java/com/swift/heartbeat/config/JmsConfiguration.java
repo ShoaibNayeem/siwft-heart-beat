@@ -3,6 +3,7 @@ package com.swift.heartbeat.config;
 import java.util.concurrent.Executor;
 
 import javax.jms.ConnectionFactory;
+import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +16,17 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+
 @Configuration
 @EnableJms
 public class JmsConfiguration {
+	
+	@Bean
+    public LockProvider lockProvider(DataSource dataSource) {
+        return new JdbcTemplateLockProvider(dataSource);
+    }
 
 	@Bean
 	public JmsListenerContainerFactory<?> myFactory(ConnectionFactory connectionFactory,
