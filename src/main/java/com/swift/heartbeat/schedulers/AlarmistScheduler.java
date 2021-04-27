@@ -28,7 +28,7 @@ public class AlarmistScheduler {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@Async("alarmistSchedulerJobPool")
-	@Scheduled(cron = "0 */10 * * * 1-5")
+	@Scheduled(cron = "${ALARMIST_CRON_SCHEDULER}")
 	@SchedulerLock(name = "AlarmistScheduler_alarmistCheck", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void alarmistCheck() {
 		LOGGER.info("Alarmist scheduler called");

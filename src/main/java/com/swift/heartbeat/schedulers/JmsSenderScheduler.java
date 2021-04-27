@@ -39,7 +39,7 @@ public class JmsSenderScheduler {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@Async("jmsSenderSchedulerJobPool")
-	@Scheduled(cron = "0 */10 * * * *")
+	@Scheduled(cron = "${SENDER_CRON_SCHEDULER}")
 	@SchedulerLock(name = "JmsSenderScheduler_sendMessageToQueue", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
@@ -55,7 +55,7 @@ public class JmsSenderScheduler {
 			swiftHeartBeatEntity.setAlarmActive(false);
 			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
-			jmsTemplate.convertAndSend("http://localhost:8161/queue", message);
+			jmsTemplate.convertAndSend(appParamsMap.get(Constants.QUEUE_NAME.getValue()), message);
 			LOGGER.info("Message sent to queue");
 		} else {
 			LOGGER.info("Current time is not in between the specified time");
@@ -157,7 +157,8 @@ public class JmsSenderScheduler {
 	private String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
-		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000").append("}\n");
+		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000")
+				.append("}\n");
 		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}\n");
 		msg.append("{4:20:SWIFTHEARTBEAT" + "\n" + ":12:123" + "\n" + ":77E:").append(uuid + "\n").append("-}");
 		LOGGER.info("Prepared message " + msg.toString());

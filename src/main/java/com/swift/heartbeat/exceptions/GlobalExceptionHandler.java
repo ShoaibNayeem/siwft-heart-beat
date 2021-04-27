@@ -14,6 +14,6 @@ public class GlobalExceptionHandler extends RuntimeException {
 
 	@ExceptionHandler(Exception.class)
 	public void handleExceptions(Exception ex) {
-		LOGGER.error("Exception occcured " + ex.getMessage());
+		LOGGER.error("Runtime Exception occcured " + ex.getMessage());
 	}
 }

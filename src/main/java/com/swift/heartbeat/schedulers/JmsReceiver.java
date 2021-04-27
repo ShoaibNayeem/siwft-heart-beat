@@ -20,15 +20,20 @@ public class JmsReceiver {
 	@Autowired
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
-	@JmsListener(destination = "http://localhost:8161/queue")
+	@JmsListener(destination = "${QUEUE_NAME}", containerFactory = "myFactory", concurrency = "1")
 	public void receiveMessage(String message) {
-		LOGGER.info("Recieved message from the queue " + message);
-		String correlationId = getCorrelationIdFromMessage(message);
-		LOGGER.info("Extracted correlation Id from the message --> " + correlationId);
-		SwiftHeartBeatEntity swiftHeartBeatEntity = swiftHeartBeatRepository.findByCorrelationId(correlationId);
-		swiftHeartBeatEntity.setRepTimestamp(new Date());
-		swiftHeartBeatEntity.setAlarmistCheck("NEW");
-		swiftHeartBeatRepository.save(swiftHeartBeatEntity);
+		try {
+			LOGGER.info("Recieved message from the queue " + message);
+			String correlationId = getCorrelationIdFromMessage(message);
+			LOGGER.info("Extracted correlation Id from the message --> " + correlationId);
+			SwiftHeartBeatEntity swiftHeartBeatEntity = swiftHeartBeatRepository.findByCorrelationId(correlationId);
+			swiftHeartBeatEntity.setRepTimestamp(new Date());
+			swiftHeartBeatEntity.setAlarmistCheck("NEW");
+			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
+		} catch (Exception e) {
+			LOGGER.error("Exception occured in JMS listener " + e.getMessage());
+		}
+		
 	}
 
 	private String getCorrelationIdFromMessage(String message) {
