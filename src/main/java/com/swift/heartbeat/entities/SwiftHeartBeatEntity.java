@@ -26,7 +26,7 @@ public class SwiftHeartBeatEntity {
 	private Long elapsedTimeInMin;
 
 	@Column(name = TableConstants.COL_SWIFT_ALARM_ACTIVE)
-	private Boolean alarmActive;
+	private String alarmActive;
 
 	@Column(name = TableConstants.COL_SWIFT_ALARMIST_CHECK)
 	private String alarmistCheck;
@@ -63,11 +63,11 @@ public class SwiftHeartBeatEntity {
 		this.elapsedTimeInMin = elapsedTimeInMin;
 	}
 
-	public Boolean getAlarmActive() {
+	public String getAlarmActive() {
 		return alarmActive;
 	}
 
-	public void setAlarmActive(Boolean alarmActive) {
+	public void setAlarmActive(String alarmActive) {
 		this.alarmActive = alarmActive;
 	}
 

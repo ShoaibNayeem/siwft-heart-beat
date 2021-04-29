@@ -10,7 +10,7 @@ public class TableConstants {
 	public static final String COL_SWIFT_REP_TIME_STAMP = "rep_time_stamp";
 	public static final String COL_SWIFT_ELAPSED_TIME = "elapsed_time_in_min";
 	public static final String COL_SWIFT_ALARM_ACTIVE = "alarm_active";
-	public static final String COL_SWIFT_ALARMIST_CHECK = "alarmsit_check";
+	public static final String COL_SWIFT_ALARMIST_CHECK = "alarmist_check";
 	
 	public static final String COL_APP_PARAM_ID = "id";
 	public static final String COL_APP_PARAM_KEY = "key";

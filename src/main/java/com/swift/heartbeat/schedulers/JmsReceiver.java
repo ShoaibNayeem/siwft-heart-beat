@@ -20,7 +20,7 @@ public class JmsReceiver {
 	@Autowired
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
-	@JmsListener(destination = "${QUEUE_NAME}", containerFactory = "myFactory", concurrency = "1")
+	@JmsListener(destination = "${REP_QUEUE_NAME}", containerFactory = "myFactory", concurrency = "1")
 	public void receiveMessage(String message) {
 		try {
 			LOGGER.info("Recieved message from the queue " + message);
@@ -33,7 +33,6 @@ public class JmsReceiver {
 		} catch (Exception e) {
 			LOGGER.error("Exception occured in JMS listener " + e.getMessage());
 		}
-		
 	}
 
 	private String getCorrelationIdFromMessage(String message) {
