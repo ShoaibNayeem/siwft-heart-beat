@@ -39,11 +39,11 @@ public class JmsSenderScheduler {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@Async("jmsSenderSchedulerJobPool")
-	@Scheduled(cron = "${SENDER_CRON_SCHEDULER}")
+	@Scheduled(cron = "${shb.sender.cron.scheduler}")
 	@SchedulerLock(name = "JmsSenderScheduler_sendMessageToQueue", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
+		appParamsMap = swiftHeartBeatUtils.getShb();
 		if (appParamsMap != null && !appParamsMap.isEmpty() && checkTime(appParamsMap)) {
 			String uuid = generateUUID();
 			LOGGER.info("Sending message to queue");
@@ -79,64 +79,64 @@ public class JmsSenderScheduler {
 		LocalTime endTime = null;
 		switch (currentDay) {
 		case "MONDAY":
-			if (!appParamsMap.get(Constants.SENDER_MON_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.MON_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_MON_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_MON_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.MON_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.MON_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "TUESDAY":
-			if (!appParamsMap.get(Constants.SENDER_TUES_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.TUES_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_TUES_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_TUES_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.TUES_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.TUES_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "WEDNESDAY":
-			if (!appParamsMap.get(Constants.SENDER_WED_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.WED_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_WED_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_WED_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.WED_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.WED_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "THURSDAY":
-			if (!appParamsMap.get(Constants.SENDER_THUR_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.THUR_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_THUR_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_THUR_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.THUR_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.THUR_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "FRIDAY":
-			if (!appParamsMap.get(Constants.SENDER_FRI_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.FRI_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_FRI_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_FRI_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.FRI_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.FRI_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "SATURDAY":
-			if (!appParamsMap.get(Constants.SENDER_SAT_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.SAT_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_SAT_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_SAT_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SAT_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SAT_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "SUNDAY":
-			if (!appParamsMap.get(Constants.SENDER_SUN_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.SUN_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_SUN_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.SENDER_SUN_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SUN_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SUN_END_TIME.getValue()));
 			} else {
 				return false;
 			}

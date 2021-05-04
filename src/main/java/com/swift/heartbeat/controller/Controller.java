@@ -44,7 +44,7 @@ public class Controller {
 		LOGGER.info("On Demand service called");
 		String status = Constants.FAILURE.getValue();
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
+		appParamsMap = swiftHeartBeatUtils.getShb();
 		if (appParamsMap != null && !appParamsMap.isEmpty()) {
 			Session session = getSessionInstance(appParamsMap);
 			status = emailService.sendEmail(session, appParamsMap);

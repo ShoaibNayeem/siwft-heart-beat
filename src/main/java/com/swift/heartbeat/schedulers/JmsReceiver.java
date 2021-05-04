@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+import com.swift.heartbeat.constants.Constants;
 import com.swift.heartbeat.entities.SwiftHeartBeatEntity;
 import com.swift.heartbeat.repositories.SwiftHeartBeatRepository;
 
@@ -20,7 +21,7 @@ public class JmsReceiver {
 	@Autowired
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
-	@JmsListener(destination = "${REP_QUEUE_NAME}", containerFactory = "myFactory", concurrency = "1")
+	@JmsListener(destination = "${shb.req.queue.name}", containerFactory = "myFactory", concurrency = "1")
 	public void receiveMessage(String message) {
 		try {
 			LOGGER.info("Recieved message from the queue " + message);
@@ -28,7 +29,7 @@ public class JmsReceiver {
 			LOGGER.info("Extracted correlation Id from the message --> " + correlationId);
 			SwiftHeartBeatEntity swiftHeartBeatEntity = swiftHeartBeatRepository.findByCorrelationId(correlationId);
 			swiftHeartBeatEntity.setRepTimestamp(new Date());
-			swiftHeartBeatEntity.setAlarmistCheck("NEW");
+			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
 		} catch (Exception e) {
 			LOGGER.error("Exception occured in JMS listener " + e.getMessage());

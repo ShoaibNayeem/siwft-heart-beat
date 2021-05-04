@@ -34,12 +34,12 @@ public class AlarmistScheduler {
 	private SwiftHeartBeatUtils swiftHeartBeatUtils;
 
 	@Async("alarmistSchedulerJobPool")
-	@Scheduled(cron = "${ALARMIST_CRON_SCHEDULER}")
+	@Scheduled(cron = "${shb.alarmist.cron.scheduler}")
 	@SchedulerLock(name = "AlarmistScheduler_alarmistCheck", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
 	public void alarmistCheck() {
 		LOGGER.info("Alarmist scheduler called");
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
+		appParamsMap = swiftHeartBeatUtils.getShb();
 		if (appParamsMap != null && !appParamsMap.isEmpty() && checkTime(appParamsMap)) {
 			List<SwiftHeartBeatEntity> swiftHeartBeatEntities = swiftHeartBeatRepository
 					.findAllByAlarmistCheck(Constants.NEW.getValue());
@@ -48,8 +48,7 @@ public class AlarmistScheduler {
 				for (SwiftHeartBeatEntity swiftHeartBeatEntity : swiftHeartBeatEntities) {
 					long elapsedTime = findDifferenceInTime(swiftHeartBeatEntity);
 					swiftHeartBeatEntity.setElapsedTimeInMin(elapsedTime);
-					if (elapsedTime >= Integer
-							.parseInt(swiftHeartBeatUtils.getAppParamsMap().get(Constants.ELAPSED_TIME.getValue()))) {
+					if (elapsedTime >= Integer.parseInt(appParamsMap.get(Constants.ELAPSED_TIME.getValue()))) {
 						LOGGER.info("Elapsed time is above the limit " + elapsedTime);
 						swiftHeartBeatEntity.setAlarmActive(Constants.TRUE.getValue());
 					}
@@ -69,64 +68,64 @@ public class AlarmistScheduler {
 		LocalTime endTime = null;
 		switch (currentDay) {
 		case "MONDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_MON_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.MON_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_MON_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_MON_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.MON_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.MON_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "TUESDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_TUES_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.TUES_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_TUES_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_TUES_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.TUES_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.TUES_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "WEDNESDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_WED_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.WED_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_WED_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_WED_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.WED_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.WED_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "THURSDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_THUR_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.THUR_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_THUR_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_THUR_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.THUR_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.THUR_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "FRIDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_FRI_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.FRI_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_FRI_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_FRI_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.FRI_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.FRI_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "SATURDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_SAT_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.SAT_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_SAT_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_SAT_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SAT_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SAT_END_TIME.getValue()));
 			} else {
 				return false;
 			}
 			break;
 		case "SUNDAY":
-			if (!appParamsMap.get(Constants.ALARMIST_SUN_START_TIME.getValue()).toUpperCase()
+			if (!appParamsMap.get(Constants.SUN_START_TIME.getValue()).toUpperCase()
 					.equals(Constants.NO_RUN.getValue())) {
-				startTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_SUN_START_TIME.getValue()));
-				endTime = LocalTime.parse(appParamsMap.get(Constants.ALARMIST_SUN_END_TIME.getValue()));
+				startTime = LocalTime.parse(appParamsMap.get(Constants.SUN_START_TIME.getValue()));
+				endTime = LocalTime.parse(appParamsMap.get(Constants.SUN_END_TIME.getValue()));
 			} else {
 				return false;
 			}
@@ -146,8 +145,14 @@ public class AlarmistScheduler {
 
 	private long findDifferenceInTime(SwiftHeartBeatEntity swiftHeartBeatEntity) {
 		LOGGER.info("Finding the elapsed time");
-		long diffInTime = (swiftHeartBeatEntity.getRepTimestamp().getTime()
-				- swiftHeartBeatEntity.getReqTimestamp().getTime());
+		long diffInTime = 0;
+		if (swiftHeartBeatEntity.getRepTimestamp() == null) {
+			Date currentDate = new Date();
+			diffInTime = (currentDate.getTime() - swiftHeartBeatEntity.getReqTimestamp().getTime());
+		} else {
+			diffInTime = (swiftHeartBeatEntity.getRepTimestamp().getTime()
+					- swiftHeartBeatEntity.getReqTimestamp().getTime());
+		}
 		return (diffInTime / (1000 * 60)) % 60;
 	}
 

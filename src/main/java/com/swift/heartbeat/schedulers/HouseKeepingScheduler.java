@@ -26,9 +26,9 @@ public class HouseKeepingScheduler {
 //	@Scheduled(cron = "0 */10 * * * 1-5")
 	public void houseKeeping() {
 		Map<String, String> appParamsMap = new HashMap<>();
-		appParamsMap = swiftHeartBeatUtils.getAppParamsMap();
-		LocalDateTime currentData = LocalDateTime.now();
-		LocalDateTime houseKeepingDate = currentData
+		appParamsMap = swiftHeartBeatUtils.getShb();
+		LocalDateTime currentDate = LocalDateTime.now();
+		LocalDateTime houseKeepingDate = currentDate
 				.minusDays(Long.parseLong(appParamsMap.get(Constants.HOUSEKEEPING_TERM_IN_DAYS.getValue())));
 		swiftHeartBeatRepository.deleteOldRecords(houseKeepingDate);
 	}
