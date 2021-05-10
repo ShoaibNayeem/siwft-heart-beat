@@ -61,9 +61,9 @@ public class AlarmistScheduler {
 		}
 	}
 
-	private boolean checkTime(Map<String, String> appParamsMap) {
+	public boolean checkTime(Map<String, String> appParamsMap) {
 		LOGGER.info("Checking the current time is in between specified time");
-		String currentDay = checkCurrentDay();
+		String currentDay = getCurrentDay();
 		LocalTime startTime = null;
 		LocalTime endTime = null;
 		switch (currentDay) {
@@ -138,12 +138,12 @@ public class AlarmistScheduler {
 		return (currentTime.isAfter(startTime) && currentTime.isBefore(endTime));
 	}
 
-	private String checkCurrentDay() {
+	public String getCurrentDay() {
 		LocalDate date = LocalDate.now();
 		return date.getDayOfWeek().toString();
 	}
 
-	private long findDifferenceInTime(SwiftHeartBeatEntity swiftHeartBeatEntity) {
+	public long findDifferenceInTime(SwiftHeartBeatEntity swiftHeartBeatEntity) {
 		LOGGER.info("Finding the elapsed time");
 		long diffInTime = 0;
 		if (swiftHeartBeatEntity.getRepTimestamp() == null) {

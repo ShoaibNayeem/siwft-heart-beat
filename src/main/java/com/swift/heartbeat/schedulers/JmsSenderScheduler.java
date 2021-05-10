@@ -61,7 +61,7 @@ public class JmsSenderScheduler {
 		}
 	}
 
-	private String generateUUID() {
+	public String generateUUID() {
 		String uuid = UUID.randomUUID().toString();
 		Optional<SwiftHeartBeatEntity> swiftHeartBeatEntity = swiftHeartBeatRepository.findById(uuid);
 		if (swiftHeartBeatEntity.isPresent()) {
@@ -72,9 +72,9 @@ public class JmsSenderScheduler {
 		return uuid;
 	}
 
-	private boolean checkTime(Map<String, String> appParamsMap) {
+	public boolean checkTime(Map<String, String> appParamsMap) {
 		LOGGER.info("Checking the current time is in between specified time");
-		String currentDay = checkCurrentDay();
+		String currentDay = getCurrentDay();
 		LocalTime startTime = null;
 		LocalTime endTime = null;
 		switch (currentDay) {
@@ -149,12 +149,12 @@ public class JmsSenderScheduler {
 		return (currentTime.isAfter(startTime) && currentTime.isBefore(endTime));
 	}
 
-	private String checkCurrentDay() {
+	public String getCurrentDay() {
 		LocalDate date = LocalDate.now();
 		return date.getDayOfWeek().toString();
 	}
 
-	private String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
+	public String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
 		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000")
