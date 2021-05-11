@@ -35,6 +35,20 @@ public class SwiftHeartBeatRepositoryTest {
 	}
 
 	@Test
+	public void updateEntityTest() {
+		SwiftHeartBeatEntity swiftHeartBeatEntity = new SwiftHeartBeatEntity();
+		swiftHeartBeatEntity.setCorrelationId("123abc");
+		swiftHeartBeatEntity.setReqTimestamp(new Date());
+		entityManager.persist(swiftHeartBeatEntity);
+		SwiftHeartBeatEntity swift = swiftHeartBeatRepository.findByCorrelationId("123abc");
+		swift.setRepTimestamp(new Date());
+		swift.setAlarmistCheck(Constants.NEW.getValue());
+		entityManager.persist(swift);
+		SwiftHeartBeatEntity swift1 = swiftHeartBeatRepository.findByCorrelationId("123abc");
+		Assert.assertEquals(swift1.getAlarmistCheck(), Constants.NEW.getValue());
+	}
+	
+	@Test
 	public void getEntityWithAlarmistCheckNew() {
 		SwiftHeartBeatEntity swiftHeartBeatEntity = new SwiftHeartBeatEntity();
 		swiftHeartBeatEntity.setCorrelationId("123abc");
