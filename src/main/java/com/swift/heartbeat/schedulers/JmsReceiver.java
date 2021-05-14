@@ -2,6 +2,9 @@ package com.swift.heartbeat.schedulers;
 
 import java.util.Date;
 
+import javax.jms.Message;
+import javax.jms.TextMessage;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +25,18 @@ public class JmsReceiver {
 	private SwiftHeartBeatRepository swiftHeartBeatRepository;
 
 	@JmsListener(destination = "${shb.req.queue.name}", containerFactory = "myFactory", concurrency = "1")
-	public void receiveMessage(String message) {
+	public void receiveMessage(Message message) {
 		try {
-			LOGGER.info("Recieved message from the queue " + message);
-			String correlationId = getCorrelationIdFromMessage(message);
-			LOGGER.info("Extracted correlation Id from the message --> " + correlationId);
-			SwiftHeartBeatEntity swiftHeartBeatEntity = swiftHeartBeatRepository.findByCorrelationId(correlationId);
+			LOGGER.info("Recieved message from the queue \n" + message);
+			String messageData = null;
+			if (message instanceof TextMessage) {
+				TextMessage textMessage = (TextMessage) message;
+				messageData = textMessage.getText();
+				System.out.println("message " + messageData);
+			}
+			String correlationId = getCorrelationIdFromMessage(messageData);
+			LOGGER.info("Extracted correlation Id from the message --> " + correlationId.trim());
+			SwiftHeartBeatEntity swiftHeartBeatEntity = swiftHeartBeatRepository.findByCorrelationId(correlationId.trim());
 			swiftHeartBeatEntity.setRepTimestamp(new Date());
 			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);

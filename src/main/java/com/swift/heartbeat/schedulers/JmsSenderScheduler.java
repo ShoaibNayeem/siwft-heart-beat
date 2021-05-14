@@ -9,10 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -40,7 +45,7 @@ public class JmsSenderScheduler {
 
 	@Async("jmsSenderSchedulerJobPool")
 	@Scheduled(cron = "${shb.sender.cron.scheduler}")
-	@SchedulerLock(name = "JmsSenderScheduler_sendMessageToQueue", lockAtLeastFor = "PT2M", lockAtMostFor = "PT5M")
+	@SchedulerLock(name = "JmsSenderScheduler_sendMessageToQueue", lockAtLeastFor = "PT30S", lockAtMostFor = "PT5M")
 	public void sendMessageToQueue() {
 		Map<String, String> appParamsMap = new HashMap<>();
 		appParamsMap = swiftHeartBeatUtils.getShb();
@@ -54,7 +59,11 @@ public class JmsSenderScheduler {
 			swiftHeartBeatEntity.setAlarmActive(Constants.FALSE.getValue());
 			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
 			swiftHeartBeatRepository.save(swiftHeartBeatEntity);
-			jmsTemplate.convertAndSend(appParamsMap.get(Constants.REQ_QUEUE_NAME.getValue()), message);
+			jmsTemplate.send(appParamsMap.get(Constants.REQ_QUEUE_NAME.getValue()), new MessageCreator() {
+				public Message createMessage(Session session) throws JMSException {
+					return session.createTextMessage(message);
+				}
+			});
 			LOGGER.info("Message sent to queue");
 		} else {
 			LOGGER.info("Current time is not in between the specified time");
@@ -157,10 +166,10 @@ public class JmsSenderScheduler {
 	public String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
-		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000")
-				.append("}\n");
-		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}\n");
-		msg.append("{4:20:SWIFTHEARTBEAT" + "\n" + ":12:123" + "\n" + ":77E:").append(uuid + "\n").append("-}");
+		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000}").append(System.getProperty("line.separator"));
+		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}").append(System.getProperty("line.separator"));
+		msg.append("{4:20:SWIFTHEARTBEAT").append(System.getProperty("line.separator")).append(":12:123").append(System.getProperty("line.separator"))
+		.append(":77E:").append(uuid).append(System.getProperty("line.separator")).append("-}");
 		LOGGER.info("Prepared message " + msg.toString());
 		return msg.toString();
 	}

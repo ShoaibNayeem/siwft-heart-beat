@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.swift.heartbeat.constants.Constants;
@@ -24,6 +25,16 @@ public class JmsSenderSchedulerTest {
 
 	@Autowired
 	private JmsSenderScheduler jmsSenderScheduler;
+	
+	@Autowired
+	private JmsTemplate jmsTemplate;
+
+	@Test
+	public void test() {
+	    this.jmsTemplate.convertAndSend("foo", "Hello, world!");
+	    this.jmsTemplate.setReceiveTimeout(10_000);
+	    Assert.assertEquals(this.jmsTemplate.receiveAndConvert("foo"), "Hello, world!");
+	}
 
 	@Test
 	public void getCurrentDayTest() {

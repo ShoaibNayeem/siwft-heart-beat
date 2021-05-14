@@ -14,12 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-unittesting.properties")
 class HeartBeatApplicationTests {
-
 	@Test
 	void contextLoads() {
 		Assert.assertTrue(true);
 	}
-	
-	
-
 }

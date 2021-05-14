@@ -47,12 +47,16 @@ public class AlarmistScheduler {
 			if (swiftHeartBeatEntities != null && !swiftHeartBeatEntities.isEmpty()) {
 				for (SwiftHeartBeatEntity swiftHeartBeatEntity : swiftHeartBeatEntities) {
 					long elapsedTime = findDifferenceInTime(swiftHeartBeatEntity);
-					swiftHeartBeatEntity.setElapsedTimeInMin(elapsedTime);
-					if (elapsedTime >= Integer.parseInt(appParamsMap.get(Constants.ELAPSED_TIME.getValue()))) {
+					if (swiftHeartBeatEntity.getRepTimestamp() != null
+							&& elapsedTime <= Integer.parseInt(appParamsMap.get(Constants.ELAPSED_TIME.getValue()))) {
+						swiftHeartBeatEntity.setElapsedTimeInMin(elapsedTime);
+						swiftHeartBeatEntity.setAlarmistCheck(Constants.COMPLETED.getValue());
+					}
+					if (elapsedTime > Integer.parseInt(appParamsMap.get(Constants.ELAPSED_TIME.getValue()))) {
 						LOGGER.info("Elapsed time is above the limit " + elapsedTime);
 						swiftHeartBeatEntity.setAlarmActive(Constants.TRUE.getValue());
+						swiftHeartBeatEntity.setAlarmistCheck(Constants.COMPLETED.getValue());
 					}
-					swiftHeartBeatEntity.setAlarmistCheck(Constants.COMPLETED.getValue());
 					swiftHeartBeatRepository.save(swiftHeartBeatEntity);
 				}
 			}
