@@ -1,13 +1,14 @@
 package com.swift.heartbeat.schedulers;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -50,11 +51,11 @@ public class JmsSenderScheduler {
 		Map<String, String> appParamsMap = new HashMap<>();
 		appParamsMap = swiftHeartBeatUtils.getShb();
 		if (appParamsMap != null && !appParamsMap.isEmpty() && checkTime(appParamsMap)) {
-			String uuid = generateUUID();
+			String correlationId = generateCorrelationId();
 			LOGGER.info("Sending message to queue");
-			String message = generateQueueMessage(appParamsMap, uuid);
+			String message = generateQueueMessage(appParamsMap, correlationId);
 			SwiftHeartBeatEntity swiftHeartBeatEntity = new SwiftHeartBeatEntity();
-			swiftHeartBeatEntity.setCorrelationId(uuid);
+			swiftHeartBeatEntity.setCorrelationId(correlationId);
 			swiftHeartBeatEntity.setReqTimestamp(new Date());
 			swiftHeartBeatEntity.setAlarmActive(Constants.FALSE.getValue());
 			swiftHeartBeatEntity.setAlarmistCheck(Constants.NEW.getValue());
@@ -70,15 +71,15 @@ public class JmsSenderScheduler {
 		}
 	}
 
-	public String generateUUID() {
-		String uuid = UUID.randomUUID().toString();
-		Optional<SwiftHeartBeatEntity> swiftHeartBeatEntity = swiftHeartBeatRepository.findById(uuid);
-		if (swiftHeartBeatEntity.isPresent()) {
-			LOGGER.info("Record found with the uuid " + swiftHeartBeatEntity.toString());
-			LOGGER.info("Generating new uuid");
-			generateUUID();
+	public String generateCorrelationId() {
+		String correlationId = null;
+		try {
+			correlationId = InetAddress.getLocalHost().getHostName().concat(LocalDateTime.now().toString());
+			LOGGER.info("Generated correlation Id " + correlationId);
+		} catch (UnknownHostException e) {
+			LOGGER.error("Exception occurred while generating correlation Id " + e.getMessage());
 		}
-		return uuid;
+		return correlationId;
 	}
 
 	public boolean checkTime(Map<String, String> appParamsMap) {
@@ -166,10 +167,13 @@ public class JmsSenderScheduler {
 	public String generateQueueMessage(Map<String, String> appParamsMap, String uuid) {
 		LOGGER.info("Preparing message");
 		StringBuilder msg = new StringBuilder();
-		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000}").append(System.getProperty("line.separator"));
-		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}").append(System.getProperty("line.separator"));
-		msg.append("{4:20:SWIFTHEARTBEAT").append(System.getProperty("line.separator")).append(":12:123").append(System.getProperty("line.separator"))
-		.append(":77E:").append(uuid).append(System.getProperty("line.separator")).append("-}");
+		msg.append("{1:F01").append(appParamsMap.get(Constants.SENDER_BIC.getValue())).append("0000000000}")
+				.append(System.getProperty("line.separator"));
+		msg.append("{2:I198").append(appParamsMap.get(Constants.RECEIVER_BIC.getValue())).append("N}")
+				.append(System.getProperty("line.separator"));
+		msg.append("{4:20:SWIFTHEARTBEAT").append(System.getProperty("line.separator")).append(":12:123")
+				.append(System.getProperty("line.separator")).append(":77E:").append(uuid)
+				.append(System.getProperty("line.separator")).append("-}");
 		LOGGER.info("Prepared message " + msg.toString());
 		return msg.toString();
 	}
