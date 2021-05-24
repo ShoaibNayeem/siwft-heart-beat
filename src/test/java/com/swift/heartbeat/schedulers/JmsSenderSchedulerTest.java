@@ -45,9 +45,9 @@ public class JmsSenderSchedulerTest {
 	}
 
 	@Test
-	public void generateUUIDTest() {
-		String uuid = jmsSenderScheduler.generateUUID();
-		Assert.assertTrue(uuid != null);
+	public void generateCorrelationIdTest() {
+		String correlationId = jmsSenderScheduler.generateCorrelationId();
+		Assert.assertTrue(correlationId != null);
 	}
 
 	@Test
